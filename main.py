@@ -27,3 +27,9 @@ async def create_item(resultinfo: Annotated[ResultInfo,Body(embed=True)]):
     stockinfoObj = StockInfo()
     resultData = stockinfoObj.getResultDetails(resultinfo.symbol.upper(),resultinfo.result_type)
     return resultData
+
+@app.post("/corpActions/")
+async def create_item(stockdetails: Annotated[StockDetails,Body(embed=True)]):
+    stockinfoObj = StockInfo()
+    corpActionsData = stockinfoObj.getCorpActions(stockdetails.symbol.upper())
+    return corpActionsData

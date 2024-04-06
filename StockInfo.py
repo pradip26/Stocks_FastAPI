@@ -6,6 +6,7 @@ class StockInfo:
     stockInfoCollection = "stock_details"
     stockPriceCollection = 'stock_tradinginfo'
     stockResultCollection = 'stock_results'
+    stockCorpActionCollection = 'stock_corp_action'
 
     def __init__(self):
         self.mongoObj = Mongo()
@@ -69,6 +70,20 @@ class StockInfo:
         response = []
         fields = {"_id": 0, "symbol": 1 ,"income": 1, "eps": 1, "profit_after_tax": 1, "profit_before_tax": 1, "from_date": 1, "to_date": 1}
         data = self.mongoObj.getRecords(self.stockResultCollection, condition, fields, sortFields, limitValue)
+        for d in data:
+            res = dict(d)
+            response.append(res)
+        return response
+
+    def getCorpActions(self, symbol):
+
+        condition = {
+            'symbol': symbol,
+        }
+        response = []
+        fields = {"_id": 0}
+        sortFields = {"exdate": -1}
+        data = self.mongoObj.getRecords(self.stockCorpActionCollection, condition, fields, sortFields)
         for d in data:
             res = dict(d)
             response.append(res)
