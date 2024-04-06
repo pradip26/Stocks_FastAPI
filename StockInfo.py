@@ -55,24 +55,23 @@ class StockInfo:
         return response
 
     def getResultDetails(self, symbol, resultType):
-        limitValue = sortFields = None
+        condition = {
+            'symbol': symbol,
+        }
+
         if resultType == 'all':
-            condition = {
-                'symbol': symbol,
-            }
+            limit = sort = None
         else:
-            condition = {
-                'symbol': symbol,
-            }
-            limitValue = 1
-            sortFields = {"to_date": -1}
+            limit = 1
+            sort = {"to_date": -1}
 
         response = []
         fields = {"_id": 0, "symbol": 1 ,"income": 1, "eps": 1, "profit_after_tax": 1, "profit_before_tax": 1, "from_date": 1, "to_date": 1}
-        data = self.mongoObj.getRecords(self.stockResultCollection, condition, fields, sortFields, limitValue)
+        data = self.mongoObj.getRecords(self.stockResultCollection, condition, fields, sort, limit)
         for d in data:
             res = dict(d)
             response.append(res)
+
         return response
 
     def getCorpActions(self, symbol):

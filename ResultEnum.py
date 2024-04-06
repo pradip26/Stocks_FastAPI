@@ -2,6 +2,8 @@ from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, Field
 
+#ref URL for enum : https://www.getorchestra.io/guides/fastapi-enum-classes-using-python-enum-for-field-values
+
 class resultEnum(Enum):
     ALL = 'all'
     RECENT = 'recent'
