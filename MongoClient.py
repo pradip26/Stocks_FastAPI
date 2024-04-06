@@ -60,12 +60,21 @@ class Mongo:
             self.writeLogs(error)
 
     # get records from collection based on the condition
-    def getRecords(self, collection, condition=None):
+    def getRecords(self, collection, condition=None, fields=None, sortFields=None,limitValue=None):
         if condition is None:
             condition = {}
         try:
             col = self.database[collection]
-            data = col.find(condition)
+
+            if sortFields is not None and limitValue is not None:
+                data = col.find(condition, fields).sort(sortFields).limit(limitValue)
+            elif limitValue is not None:
+                data = col.find(condition, fields).limit(limitValue)
+            elif sortFields is not None:
+                data = col.find(condition, fields).sort(sortFields)
+            else:
+                data = col.find(condition, fields)
+
             return data
         except:
             error = ' Unable to fetch records, Filter : ' + condition + ' Collection : ' + collection
