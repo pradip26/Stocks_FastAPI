@@ -26,7 +26,7 @@ class StockInfo:
                 'industry': info['industry'],
                 'short_name': info['short_name'],
                 'status': info['status'],
-                'price_info': priceData
+                'price_info': priceData[0]
             }
             response.append(result)
         return response
@@ -49,7 +49,8 @@ class StockInfo:
                 'week_high': d['week_high'],
                 'week_low': d['week_low'],
                 'mcap': d['mcap'],
-                'totalTradedValue': d['totalTradedValue']
+                'totalTradedValue': d['totalTradedValue'],
+                'last_traded_date': d['last_traded_date']
             }
             response.append(res)
         return response
