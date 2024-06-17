@@ -9,6 +9,8 @@ class StockInfo:
     stockCorpActionCollection = 'stock_corp_action'
     stockHistPriceCollection = 'stock_hist_prices'
     stockScoreCollection = 'stock_score'
+    sampleModelPortfolioCollection = 'sample_model_portfolio'
+    sampleModelPFDailyCollection = 'sample_model_pf_daily'
 
     def __init__(self):
         self.mongoObj = Mongo()
@@ -154,6 +156,46 @@ class StockInfo:
         fields = {"_id": 0, 'symbol': 1, 'total_point': 1, 'date': 1, 'finance_grade': 1, 'valuation_grade': 1, 'call':1}
         sortFields = {"date":-1,"total_point": -1}
         data = self.mongoObj.getRecords(self.stockScoreCollection, condition, fields, sortFields)
+        for d in data:
+            res = dict(d)
+            response.append(res)
+        return response
+
+    def getSamplePF(self):
+        condition = {}
+        response = []
+        fields = {"_id": 0}
+        sortFields = {"date": -1}
+        data = self.mongoObj.getRecords(self.sampleModelPortfolioCollection, condition, fields, sortFields)
+        for d in data:
+            res = dict(d)
+            response.append(res)
+        return response
+
+    def getSampleLatestPortfolioData(self):
+        condition = {}
+        response = []
+        fields = {"_id": 0}
+        sortFields = {"date": -1}
+        data = self.mongoObj.getRecords(self.sampleModelPFDailyCollection, condition, fields, sortFields,1)
+        response = []
+        for d in data:
+            response = {
+                "date" : d['date'],
+                'type': d['type'],
+                'current_pf_val': d['current_pf_val'],
+                'gain': d['gain'],
+                'gain_perc': d['gain_perc'],
+                'invested_val': d['invested_val'],
+            }
+        return response
+
+    def getSamplePortfolioWeeklyGraph(self):
+        condition = {}
+        response = []
+        fields = {"_id": 0, "date": 1, "current_pf_val": 1, "gain": 1, "gain_perc": 1}
+        sortFields = {"date": 1}
+        data = self.mongoObj.getRecords(self.sampleModelPFDailyCollection, condition, fields, sortFields)
         for d in data:
             res = dict(d)
             response.append(res)
