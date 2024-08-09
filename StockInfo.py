@@ -11,6 +11,7 @@ class StockInfo:
     stockScoreCollection = 'stock_score'
     sampleModelPortfolioCollection = 'sample_model_portfolio'
     sampleModelPFDailyCollection = 'sample_model_pf_daily'
+    stockMovingAvgCollection = "stock_moving_average"
 
     def __init__(self):
         self.mongoObj = Mongo()
@@ -116,7 +117,7 @@ class StockInfo:
             }
 
         response = []
-        fields = {"_id": 0, 'date': 1, 'close_price':1}
+        fields = {"_id": 0, 'date': 1, 'close_price': 1, "open_price": 1, "day_high": 1, "day_low": 1}
         sortFields = {"date": 1}
 
         data = self.mongoObj.getRecords(self.stockHistPriceCollection, condition, fields, sortFields)
@@ -199,4 +200,16 @@ class StockInfo:
         for d in data:
             res = dict(d)
             response.append(res)
+        return response
+
+    def getStockMovingAverages(self,symbol):
+        condition = {"symbol":symbol}
+        response = {}
+        fields = {"_id": 0, 'symbol': 1, 'mv_20': 1, 'mv_50': 1, 'mv_100': 1, 'mv_200': 1,'date':1}
+        sortFields = {"date": -1}
+        data = self.mongoObj.getRecords(self.stockMovingAvgCollection, condition, fields, sortFields)
+        for d in data:
+            date = d['date']
+            res = dict(d)
+            response[date] = res
         return response

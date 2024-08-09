@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Body
 from stockDetails_payload import StockDetails
 from typing import Annotated
-from StockInfo import  StockInfo
+from StockInfo import StockInfo
 from ResultEnum import ResultInfo
 from fastapi.middleware.cors import CORSMiddleware
 import datetime
@@ -92,3 +92,25 @@ async def sample_portfolio_weekly_graph():
     stockinfoObj = StockInfo()
     pfData = stockinfoObj.getSamplePortfolioWeeklyGraph()
     return pfData
+
+@app.post("/getCandleGraphData/")
+async def getCandleGraphData(stockdetails: Annotated[StockDetails,Body(embed=True)]):
+    stockinfoObj = StockInfo()
+    current_date = datetime.date.strftime(datetime.datetime.today(), "%Y-%m-%d")
+    previous_date = datetime.date.strftime((datetime.datetime.today() - datetime.timedelta(days=stockdetails.days)), "%Y-%m-%d")
+    histData = stockinfoObj.getHistPirces(stockdetails.symbol.upper(), previous_date, current_date)
+    stockMovingAverages = stockinfoObj.getStockMovingAverages(stockdetails.symbol.upper())
+    print(stockMovingAverages)
+    response = []
+    for data in histData:
+        mvData = stockMovingAverages[data['date']]
+        mv20 = round(float(mvData["mv_20"]),2)
+        mv100 = round(float(mvData['mv_100']),2)
+        mv200 = round(float(mvData['mv_200']),2)
+        newData = data
+        newData["mv_20"] = mv20
+        newData["mv_100"] = mv100
+        newData["mv_200"] = mv200
+        response.append(newData)
+
+    return response
