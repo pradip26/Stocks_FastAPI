@@ -5,6 +5,9 @@ from StockInfo import StockInfo
 from ResultEnum import ResultInfo
 from fastapi.middleware.cors import CORSMiddleware
 import datetime
+from indexDetails_payload import IndexDetails
+from IndicesInfo import IndexInfo
+
 
 app = FastAPI()
 
@@ -76,21 +79,21 @@ async def score_data(stockdetails: Annotated[StockDetails,Body(embed=True)]):
     return scoreData
 
 @app.get("/getSamplePortfolio/")
-async def list_model_pf():
+async def list_model_pf(type: str = "sample"):
     stockinfoObj = StockInfo()
-    pfData = stockinfoObj.getSamplePF()
+    pfData = stockinfoObj.getSamplePF(type)
     return pfData
 
 @app.get("/getSampleLatestPortoflioValue/")
-async def latest_sample_pf_value():
+async def latest_sample_pf_value(type: str = "sample"):
     stockinfoObj = StockInfo()
-    pfData = stockinfoObj.getSampleLatestPortfolioData()
+    pfData = stockinfoObj.getSampleLatestPortfolioData(type)
     return pfData
 
 @app.get("/getSamplePortfolioWeeklyGraph/")
-async def sample_portfolio_weekly_graph():
+async def sample_portfolio_weekly_graph(type: str = "sample"):
     stockinfoObj = StockInfo()
-    pfData = stockinfoObj.getSamplePortfolioWeeklyGraph()
+    pfData = stockinfoObj.getSamplePortfolioWeeklyGraph(type)
     return pfData
 
 @app.post("/getCandleGraphData/")
@@ -114,3 +117,51 @@ async def getCandleGraphData(stockdetails: Annotated[StockDetails,Body(embed=Tru
         response.append(newData)
 
     return response
+
+@app.post("/indicesHistPrices/")
+async def indexHistPrices(IndexDetails: Annotated[IndexDetails,Body(embed=True)]):
+    indexInfoObj = IndexInfo()
+    stockdata = indexInfoObj.getHistPirces(IndexDetails.indexcode.upper())
+    return stockdata
+
+@app.post("/stockVSIndexGraph/")
+async def stockVSndexGraphData(stockdetails: Annotated[StockDetails,Body(embed=True)]):
+    stockinfoObj = StockInfo()
+    current_date = datetime.date.strftime(datetime.datetime.today(), "%Y-%m-%d")
+    previous_date = datetime.date.strftime((datetime.datetime.today() - datetime.timedelta(days=stockdetails.days)), "%Y-%m-%d")
+    histData = stockinfoObj.getHistPirces(stockdetails.symbol.upper(), previous_date, current_date)
+
+    indexInfoObj = IndexInfo()
+    indexHistdata = indexInfoObj.getHistPirces("NIFTY 50", previous_date, current_date)
+
+    stockIistDataWithIndex = indexInfoObj.indexCalculations(histData)
+    indexHistDataWithIndexVal = indexInfoObj.indexCalculations(indexHistdata)
+
+    response = {}
+    list = []
+    for data in stockIistDataWithIndex:
+        dt = data['date']
+        price = data['price']
+        indexVal = data['index']
+        response[dt] = {
+            'date': dt,
+            'stock_price': price,
+            'stock_index_val': round(indexVal,2)
+        }
+
+    for indexdata in indexHistDataWithIndexVal:
+        dt = indexdata['date']
+        price = indexdata['price']
+        indexVal = round(indexdata['index'],2)
+        if dt in response.keys():
+            response[dt].update({'index_price':price,'index_val':indexVal})
+
+    for fd in response.values():
+        list.append(fd)
+    return list
+
+@app.post("/getIndexDetails/")
+async def getIndexDetails(IndexDetails: Annotated[IndexDetails,Body(embed=True)]):
+    indexInfoObj = IndexInfo()
+    indexData = indexInfoObj.getIndexDetails(IndexDetails.indexcode.upper())
+    return indexData

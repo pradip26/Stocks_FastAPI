@@ -162,8 +162,10 @@ class StockInfo:
             response.append(res)
         return response
 
-    def getSamplePF(self):
-        condition = {}
+    def getSamplePF(self, type = "sample"):
+        condition = {
+            "type": type
+        }
         response = []
         fields = {"_id": 0}
         sortFields = {"date": -1}
@@ -173,8 +175,10 @@ class StockInfo:
             response.append(res)
         return response
 
-    def getSampleLatestPortfolioData(self):
-        condition = {}
+    def getSampleLatestPortfolioData(self, type="sample"):
+        condition = {
+            "type": type
+        }
         response = []
         fields = {"_id": 0}
         sortFields = {"date": -1}
@@ -191,8 +195,10 @@ class StockInfo:
             }
         return response
 
-    def getSamplePortfolioWeeklyGraph(self):
-        condition = {}
+    def getSamplePortfolioWeeklyGraph(self, type="sample"):
+        condition = {
+            "type": type
+        }
         response = []
         fields = {"_id": 0, "date": 1, "current_pf_val": 1, "gain": 1, "gain_perc": 1}
         sortFields = {"date": 1}
